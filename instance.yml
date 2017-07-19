@@ -1,0 +1,79 @@
+---
+- name: aws
+  hosts: localhost,test
+  connection: local
+  become: False
+  gather_facts: true
+  vars:
+     count: 4
+     AWS_ACCESS_KEY_ID: AKIAJBCN5CVH4NL5XXTQ
+     AWS_SECRET_ACCESS_KEY: 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
+  tasks:
+    - name: creating public instance
+      ec2: 
+        aws_access_key: "{{ AWS_ACCESS_KEY_ID }}"
+        aws_secret_key: "{{ AWS_SECRET_ACCESS_KEY }}"
+        instance_type: "t2.micro"
+        instance_tags: { 'name': 'test' }
+        image: "ami-936d9d93"
+        count: "{{ count }}"
+        wait: yes
+        group_id: "sg-47230b20"
+        region: "ap-northeast-1"
+        state: present
+        vpc_subnet_id: "subnet-f4c674ac"
+        assign_public_ip: yes
+        key_name: "Nitanka-hadoop-key"
+        volumes:
+           - device_name: /dev/xvdf
+             volume_type: gp2
+             volume_size: 200
+      register: public
+
+#    - name: Creating a Volume
+#      ec2_vol:
+#        aws_access_key: "{{ AWS_ACCESS_KEY_ID }}"
+#        aws_secret_key: "{{ AWS_SECRET_ACCESS_KEY }}"
+#        instance: "{{ public.instances[0]['id'] }}"
+#        volume_size: 1000
+#        device_name: /dev/xvdf
+#        region: 'ap-northeast-1'
+#        volume_type: gp2
+#      register: ec2_vol
+
+    - name: adding host
+      add_host: 
+           name={{ public.instances[0]['public_ip'] }}
+           groups=namenode,hadoop
+           ansible_user=ubuntu
+
+    - name: adding host
+      add_host:
+           name: "{{ public.instances[item]['public_ip'] }}"
+           groups: datanode,hadoop
+           ansible_user: ubuntu
+      with_sequence: start=0 end={{ count }} stride=1
+
+#    - name: adding host
+#      add_host:
+#           name={{ public.instances[2]['public_ip'] }}
+#           groups=datanode,hadoop
+#           ansible_user=ubuntu
+
+    - pause:
+       minutes: 1
+
+- name: aws
+  hosts: namenode,datanode
+  become: yes
+  become_user: root
+  gather_facts: true
+  vars:
+      ansible_ssh_private_key_file: /Users/shahin/Downloads/Nitanka-hadoop-key.pem
+      namenode_group: namenode
+      newdatanode_group: datanode
+      hadoop_parent: hadoop
+  roles:
+    - ansible-role-java
+    - ansible-role-hadoop
+    - mount

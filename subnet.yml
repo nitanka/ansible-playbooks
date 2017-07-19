@@ -1,0 +1,18 @@
+---
+- hosts: 172.30.1.237
+  name: Create subnet for database servers
+  tasks:
+    - name: Creating public subent 
+      ec2_vpc_subnet:
+        state: present
+        cidr: 10.3.1.0/24
+        resource_tags: { "Environment":"Dev", "Name":"public"}
+        vpc_id: vpc-6c31ac09
+        region: ap-northeast-1
+    - name: Creating private subnet
+      ec2_vpc_subnet:
+        state: present
+        cidr: 10.3.2.0/24
+        resource_tags: { "Name":"private" }
+        vpc_id: vpc-6c31ac09
+        region: ap-northeast-1 

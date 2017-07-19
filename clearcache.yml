@@ -1,0 +1,15 @@
+- name: Installing HADOOP CLUSTER
+  hosts: all #hadoop, newdatanode
+  become: yes 
+  become_user: root 
+  gather_facts: true
+  vars:
+    namenode_group: namenode
+    newdatanode_group: newdatanode
+    hadoop_parent: hadoop
+  #roles:
+  #  - ansible-role-hadoop
+  # 
+  tasks: 
+  - name: Clearing the cache  
+    shell: sync; echo 3 > /proc/sys/vm/drop_caches

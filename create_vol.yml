@@ -1,0 +1,32 @@
+---
+- name: Creating a Volume
+  hosts: all
+  sudo: yes
+  tasks: 
+    
+    - name: Creating a Volume
+      ec2_vol:
+        aws_access_key: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
+        aws_secret_key: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"
+        instance: 'i-7edebfdb'
+        volume_size: 5
+        device_name: /dev/xvdf
+        region: 'ap-northeast-1'
+        volume_type: gp2
+      register: ec2_vol
+ 
+    - name: Printing the volume information
+      debug: var=ec2_vol 
+#    - name: mounting the volume
+ #     mount: name=/mnt fstype=ext4 state=mounted src=/dev/xvdf 
+   
+    - name: creating ebs dir 
+      file:
+        state: directory
+        path: /ebs
+    
+    - name: formatiing the file first
+      command: mkfs.ext4 /dev/xvdf
+
+    - name: mounting the filesystem
+      command: /bin/mount /dev/xvdf /ebs

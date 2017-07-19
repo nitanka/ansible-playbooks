@@ -1,0 +1,21 @@
+---
+- name: This playbook is a test playbook for deploying a test environment
+  sudo: yes
+  hosts: all
+  tasks:
+    - name: Create the instance using the available Security Group and VPC
+      ec2:
+        key_name: keyname
+        instance_type: t2.micro
+        image: ami-936d9d93
+        wait: yes
+        count: 1
+        group: sg-c495cba1
+        vpc_subnet_id: subnet-4a07823d
+        assign_public_ip: yes 
+        region: ap-northeast-1
+        zone: ap-northeast-1b
+        instance_tags: 
+          name: Project
+        aws_access_key: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
+        aws_secret_key: "{{lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"

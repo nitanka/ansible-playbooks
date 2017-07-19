@@ -1,0 +1,14 @@
+- name: Installing HADOOP CLUSTER
+  hosts: stopspark
+  become: true 
+  gather_facts: true
+  #vars:
+  #    master: masters
+  #    slaves: slaves      
+  #    addslaves: newslaves
+  #roles:
+  #  - ansible-role-spark
+  #   
+  tasks: 
+  - name: stop java
+    shell: killall java

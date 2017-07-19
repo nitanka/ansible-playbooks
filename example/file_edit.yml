@@ -1,0 +1,8 @@
+---
+- name: Replacing something 
+  lineinfile:
+    dest: sshd_config 
+    regexp: '^Port\s'
+    state: present
+    line: 'Port {{ubuntu_ssh_port}}'
+     

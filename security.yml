@@ -1,0 +1,23 @@
+---
+- hosts: all
+  tasks:
+   - name: Create Security
+     ec2_group:
+       name: example
+       description: an example EC2 group
+       region: ap-northeast-1
+       rules:
+        - proto: tcp
+          from_port: 80
+          to_port: 80
+          cidr_ip: 0.0.0.0/0
+        - proto: tcp
+          from_port: 22
+          to_port: 22
+          cidr_ip: 0.0.0.0/0
+       rules_egress:
+        - proto: tcp
+          from_port: 80
+          to_port: 80
+          cidr_ip: 0.0.0.0/0
+ 
