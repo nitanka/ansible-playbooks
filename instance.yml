@@ -6,8 +6,8 @@
   gather_facts: true
   vars:
      count: 4
-     AWS_ACCESS_KEY_ID: AKIAJBCN5CVH4NL5XXTQ
-     AWS_SECRET_ACCESS_KEY: 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
+     AWS_ACCESS_KEY_ID: AKxxxTQ
+     AWS_SECRET_ACCESS_KEY: 7rq
   tasks:
     - name: creating public instance
       ec2: 
