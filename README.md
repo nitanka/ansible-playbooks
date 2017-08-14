@@ -1,7 +1,11 @@
 # ansible-playbooks
-Contain Miscellaneous Ansible Scripts Used for day to day activities
+Contain the Ansible playbooks which were written to configure the following:
+- zookeeper cluster
+- Spark cluster
+- Spark HA cluster
+- Basic Mysql installation
+- Nginx installation
+- Docker installation
+- etcd installation
 
-Improvements:
-- [x] Flush out the redundant codes from the repository.
-- [ ] Testing the stable scripts.
-- [x] Naming conventions for the scripts.
+
