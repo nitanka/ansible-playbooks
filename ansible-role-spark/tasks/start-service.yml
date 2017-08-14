@@ -1,0 +1,24 @@
+---
+- name: Restart master
+  shell: service spark-master restart
+  when: RESTART_CLUSTER and inventory_hostname in groups['master']
+
+- name: Restart slaves
+  shell: service spark-slave restart
+  when: RESTART_CLUSTER and inventory_hostname in groups['slaves']
+
+- name: Get the slave process status
+  shell: service spark-slave status
+  ignore_errors: yes
+  register: service_status
+  when: inventory_hostname in groups['slaves']
+
+- name: Start slave service in 16.04
+  shell: service spark-slave start
+  when: inventory_hostname in groups['slaves'] and 'inactive' in service_status.stdout
+
+- name: Start slave service in 14.04
+  shell: service spark-slave start
+  when: inventory_hostname in groups['slaves'] and 'No worker running' in service_status.stdout and ansible_distribution_major_version == '14'
+
+

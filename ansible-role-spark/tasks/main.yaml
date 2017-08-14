@@ -1,0 +1,28 @@
+---
+- include: create-user.yaml
+- name: Checking if the node is already having spark master installed (master)
+  stat:
+    path: /etc/init.d/spark-master
+  register: spark_master
+  when: inventory_hostname in groups['master']
+
+- name: Checking if the node is already having spark worker installed
+  stat:
+    path: /etc/init.d/spark-slave
+  register: spark_slave
+  when: inventory_hostname in groups['slaves']
+
+# Downloading to the master
+- include: download.yaml
+  when: "(inventory_hostname in groups['master'])  and ( spark_master.stat.exists == false)"
+
+# Downloading to the slaves
+- include: download.yaml
+  when: "(inventory_hostname in groups['slaves']) and ( spark_slave.stat.exists == False )"
+
+- include: configure.yaml
+
+
+- include: clean-up.yaml
+- include: setup-service.yaml
+- include: start-service.yml

@@ -1,0 +1,5 @@
+---
+- name: Cleaning the tarball files
+  file:
+    path: '/tmp/zookeeper-{{ VERSION }}.tar.gz'
+    state: absent

@@ -1,0 +1,19 @@
+---
+- name: Disallow root login remotely
+  command: 'mysql -NBe "{{ item }}"'
+  with_items:
+    - DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1')
+  ignore_errors: true
+
+- name: Get list of hosts for the root user.
+  command: mysql -NBe "SELECT Host FROM mysql.user WHERE User = 'root' ORDER BY (Host='localhost')"
+  register: mysql_root_hosts
+  ignore_errors: true
+  check_mode: no
+
+- name: Update MySQL root password for localhost root account (< 5.7.x).
+  shell: >
+    mysql -NBe
+    'SET PASSWORD FOR "root"@"{{ item }}" = PASSWORD("{{ mysql_user_password }}");'
+  with_items: "{{ mysql_root_hosts.stdout_lines|default([]) }}"
+

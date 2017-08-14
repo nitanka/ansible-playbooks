@@ -1,0 +1,6 @@
+{% set HOSTLIST = groups['zookeeper'] | map('extract', hostvars, ['ansible_default_ipv4', 'address'])| list %}
+{% for host in groups['zookeeper'] %}{% if host == inventory_hostname %}
+{{ HOSTLIST.index(hostvars[host]['ansible_eth0']['ipv4']['address']) }}
+{% endif %}{% endfor %}
+
+

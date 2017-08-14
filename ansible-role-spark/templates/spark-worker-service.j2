@@ -1,0 +1,123 @@
+#!/bin/bash
+
+### BEGIN INIT INFO
+# Provides:          spark-slave
+# Required-Start:    
+# Required-Stop:     
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: spark-slave
+# Description:       spark-slave
+### END INIT INFO
+
+SPARK_BASE_DIR={{ SPARK_HOME }}
+SPARK_SBIN=$SPARK_BASE_DIR/sbin
+PID=''
+
+if [ -f $SPARK_BASE_DIR/conf/spark-env.sh  ];then
+    source $SPARK_BASE_DIR/conf/spark-env.sh
+else
+    echo "$SPARK_BASE_DIR/conf/spark-env.sh does not exist. Can't run script."
+    exit 1
+fi
+
+
+check_status() {
+
+    PID=$(ps ax | grep 'org.apache.spark.deploy.worker.Worker' | grep java | grep -v grep | awk '{print $1}')
+
+    if [ -n "$PID" ]
+    then
+    return 1
+    else
+    return 0
+    fi
+
+}
+
+start() {
+
+    check_status
+
+    if [ "$?" -ne 0 ]
+    then
+    echo "Worker already running"
+    exit 1
+    fi
+
+    echo -n "Starting workers ...  "
+
+    sudo su -c "$SPARK_SBIN/start-slave.sh spark://{{ SPARK_MASTER_HOST }}:{{ SPARK_MASTER_PORT }}" {{ SPARK_USER }} &>/dev/null
+
+    sleep 5
+
+    check_status
+
+    if [ "$?" -eq 0 ]
+    then
+    echo "FAILURE"
+    exit 1
+    fi
+
+    echo "SUCCESS"
+    exit 0
+
+}
+
+stop() {
+
+    check_status
+
+    if [ "$?" -eq 0 ]
+    then
+    echo "No worker running ..."
+    return 1
+    else
+
+    echo "Stopping workers ..."
+
+    sudo su -c "$SPARK_SBIN/stop-slave.sh" {{ SPARK_USER }} &>/dev/null
+    sleep 4
+
+    echo "done"
+
+    return 0
+    fi
+}
+
+status() {
+
+    check_status
+
+    if [ "$?" -eq 0 ]
+    then
+    echo "No worker running"
+    exit 1
+    else
+    echo -n "worker running: "
+    echo $PID
+    exit 0
+    fi
+}
+
+case "$1" in
+    start)
+    start
+    ;;
+    stop)
+    stop
+    ;;
+    restart)
+    $0 stop
+    $0 start
+    ;;
+    status)
+    status
+    ;;
+    *)
+    echo "Usage: $0 {start|stop|restart|status}"
+    exit 1
+esac
+
+exit 0
+

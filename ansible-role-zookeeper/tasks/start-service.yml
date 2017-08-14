@@ -1,0 +1,18 @@
+- name: Start cluster when RESTART_CLUSTER is true
+  shell: service zookeeper restart
+  when: RESTART_CLUSTER 
+
+- name: Get the zookeeper status
+  shell: service zookeeper status
+  register: service_status
+  ignore_errors: true
+
+- name: Start zookeeper service in 16.04
+  shell: service zookeeper start
+  when: "'inactive' in service_status.stdout"
+
+- name: Start slave service in 14.04
+  shell: service zookeeper start
+  when: "'not running' in service_status.stdout and ansible_distribution_major_version == '14'"
+
+

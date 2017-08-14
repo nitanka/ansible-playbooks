@@ -1,0 +1,6 @@
+---
+- include: install-docker.yaml
+  when: ansible_kernel.split('-')[0].split('.')[0] == KERNEL_VERSION
+
+#The condition make sure that the kernel's major version is greater than 3
+

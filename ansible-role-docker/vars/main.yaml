@@ -1,0 +1,12 @@
+---
+DOCKER_USER: ubuntu
+KERNEL_VERSION: '3' #only the kernel major version 
+DOCKER_DEPENDENCIES:
+  - apt-transport-https 
+  - ca-certificates
+DOCKER_GPG_KEY: 58118E89F3A912897C070ADBF76221572C52609D
+DOCKER_KEYSERVER: hkp://ha.pool.sks-keyservers.net:80
+DOCKER_SOURCELIST: docker
+DOCKER_REPONAME: deb https://apt.dockerproject.org/repo ubuntu-trusty main
+DOCKER_PACKAGE: docker-engine
+

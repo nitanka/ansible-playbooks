@@ -1,0 +1,124 @@
+---
+# Used only for Debian/Ubuntu installation, as the -t option for apt.
+nginx_default_release: ""
+
+# Used only for Redhat installation, enables source Nginx repo.
+nginx_yum_repo_enabled: true
+
+# Use the official Nginx PPA for Ubuntu, and the version to use if so.
+nginx_ppa_use: false
+nginx_ppa_version: stable
+
+# The name of the nginx apt/yum package to install.
+nginx_package_name: "nginx"
+
+nginx_conf_template: "nginx.conf.j2"
+nginx_vhost_template: "vhost.j2"
+
+# The number of worker processes, default = number of processor in the server
+nginx_worker_processes: "{{ ansible_processor_vcpus | default(ansible_processor_count) }}"
+nginx_worker_connections: "1024"
+nginx_multi_accept: "off"
+
+# Location of error as well as access log
+nginx_error_log: "/var/log/nginx/error.log warn"
+nginx_access_log: "/var/log/nginx/access.log main buffer=16k"
+
+# Configuration related to file transfer
+nginx_sendfile: "on"
+nginx_tcp_nopush: "on"
+nginx_tcp_nodelay: "on"
+
+nginx_keepalive_timeout: "65"
+nginx_keepalive_requests: "100"
+
+# Set it to off for security, it will leak info regarding mysql configuration
+nginx_server_tokens: "off"
+
+nginx_client_max_body_size: "64m"
+
+nginx_server_names_hash_bucket_size: "64"
+
+nginx_proxy_cache_path: ""
+
+nginx_extra_conf_options: ""
+# Example extra main options, used within the main nginx's context:
+#   nginx_extra_conf_options: |
+#     env VARIABLE;
+#     include /etc/nginx/main.d/*.conf;
+
+#nginx_extra_http_options: ""
+# Example extra http options, printed inside the main server http config:
+#    nginx_extra_http_options: |
+#      proxy_buffering    off;
+#      proxy_set_header   X-Real-IP $remote_addr;
+#      proxy_set_header   X-Scheme $scheme;
+#      proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+#      proxy_set_header   Host $http_host;
+
+nginx_extra_http_options: |
+  proxy_buffering off;
+  proxy_set_header   X-Real-IP '$remote_addr';
+  proxy_set_header   X-Scheme '$scheme';
+  proxy_set_header   X-Forwarded-For '$proxy_add_x_forwarded_for';
+  proxy_set_header   Host '$http_host';
+
+nginx_remove_default_vhost: true #Set it to false if you donot want to remove default server configuration
+nginx_vhosts: 
+  - listen: '80 default_server' #Listen port, remove the default_server if you donot plan to make the virtual host as default
+    server_name: 'example.com' # Server name, which will be domain mapped
+    root: '/var/www/example.com' # Location of index file 
+    index: 'index.html index.htm' # Name of the index file
+    #template: "{{ playbook_dir }}/roles/ansible-role-nginx/templates/myhost.j2" #Path of custom vhost
+    error_log: "/var/log/nginx/site-error.log" #Log location
+    access_log: "/var/log/nginx/site-access.log" #Log location
+#    server_name_redirect: test
+    extra_parameters: | #the block shown below is just an example, add your configurations accordingly
+      location ~ \.php$ {
+          fastcgi_split_path_info ^(.+\.php)(/.+)$;
+          fastcgi_pass unix:/var/run/php5-fpm.sock;
+          fastcgi_index index.php;
+          fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+          include fastcgi_params;
+      }
+      ssl_certificate     /etc/ssl/certs/ssl-cert-snakeoil.pem;
+      ssl_certificate_key /etc/ssl/private/ssl-cert-snakeoil.key;
+      ssl_protocols       TLSv1.1 TLSv1.2;
+      ssl_ciphers         HIGH:!aNULL:!MD5;  
+# Can be used to add extra config blocks (multiline).
+#   template: "" # Can be used to override the `nginx_vhost_template` per host.
+#   state: "absent" # To remove the vhost configuration.
+
+
+
+############################## Related to tests performed by devops team ########################
+nginx_proxy_pass:
+  - context: /test
+    server: http://localhost:8080
+  - context: /rest
+    server: http://localhost:9090
+  - context: /api
+    server: http://localhost:10010
+#################################################################################################
+
+
+#server_name_redirect:
+#  - server_name: test
+#    listen: 443
+
+#Related to the load balancing
+nginx_upstreams: []
+# - name: myapp1
+#   strategy: "ip_hash" # "least_conn", etc.
+#   keepalive: 16 # optional
+#   servers: {
+#     "srv1.example.com",
+#     "srv2.example.com weight=3",
+#     "srv3.example.com"
+#   }
+
+#Related to log format in log files, keep it as it is.
+nginx_log_format: |
+  '$remote_addr - $remote_user [$time_local] "$request" '
+  '$status $body_bytes_sent "$http_referer" '
+  '"$http_user_agent" "$http_x_forwarded_for"'

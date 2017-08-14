@@ -1,0 +1,26 @@
+---
+- name: copying spark-env.sh template
+  template:
+    src: spark-env.sh.j2 
+    dest: "{{ SPARK_HOME }}/conf/spark-env.sh"
+    mode: 0755
+    owner: "{{ SPARK_USER }}"
+    group: "{{ SPARK_GROUP }}"
+
+- name: creating the spark log directory
+  file:
+    state: directory
+    dest: "{{ SPARK_LOG_DIR }}"
+    mode: 0755
+    owner: "{{ SPARK_USER }}"
+    group: "{{ SPARK_GROUP }}"
+  when: ( SPARK_LOG_DIR is defined ) and ( SPARK_LOG_DIR|default(None) != None ) #Creates the directory only when the spark log directory is not
+                                                                                 #the default directory
+- name: creating spark local directory
+  file:
+    state: directory
+    path: "{{ SPARK_LOCAL_DIRS }}"
+    mode: 0755
+    owner: "{{ SPARK_USER }}"
+    group: "{{ SPARK_GROUP }}"
+  when: ( SPARK_LOC_DIR is defined ) and ( SPARK_LOC_DIR|default(None) != None )

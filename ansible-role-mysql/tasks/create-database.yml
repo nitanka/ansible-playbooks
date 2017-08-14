@@ -1,0 +1,18 @@
+---
+  - name: Copying the my.cnf to /root
+    copy: 
+      src: root-my.cnf.j2
+      dest: /root/.my.cnf
+
+  - name: Create the database
+    mysql_db:
+      name: '{{ item.name }}'
+      state: present
+      collation: "{{ item.collation | default('utf8_general_ci') }}"
+      encoding: "{{ item.encoding | default('utf8') }}"
+    with_items: '{{ mysql_databases }}'
+    
+  - name: Deleting the my.cnf from /root
+    file:
+      path: /root/.my.cnf
+      state: absent   

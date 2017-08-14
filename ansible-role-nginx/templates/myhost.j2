@@ -1,0 +1,20 @@
+
+{% extends "vhost.j2" %}
+server {
+
+     {% block server_end %}
+       {% for item in nginx_proxy_pass %}
+         listen {{ item['context'] }} {
+         proxy_pass {{ item['server'] }}
+       }
+       {% endfor %}
+     {% endblock server_end %}
+
+
+}   
+
+       
+
+
+
+

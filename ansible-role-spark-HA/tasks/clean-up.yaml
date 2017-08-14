@@ -1,0 +1,8 @@
+---
+#Delete the tarball files downloaded while installing spark
+- name: Delete the spark tarball file
+  file:
+    path: "/tmp/spark-{{ SPARK_VERSION }}-bin-hadoop{{ HADOOP_VERSION }}.tgz" 
+    state: absent
+
+

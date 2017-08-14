@@ -1,0 +1,42 @@
+#{{ ansible_managed }}
+
+# The number of milliseconds of each tick
+tickTime={{ TICK_TIME }}
+# The number of ticks that the initial 
+# synchronization phase can take
+initLimit={{ INIT_LIMIT }}
+# The number of ticks that can pass between 
+# sending a request and getting an acknowledgement
+syncLimit={{ SYNC_LIMIT }}
+# the directory where the snapshot is stored.
+dataDir={{ DATA_LOC }}
+# the port at which the clients will connect
+clientPort={{ CLIENT_PORT }}
+
+
+# the directory where transaction log is stored.
+# this parameter provides dedicated log device for ZooKeeper
+dataLogDir={{ DATA_LOG_LOC }}
+
+# Clients can submit requests faster than ZooKeeper can process them,
+# especially if there are a lot of clients. To prevent ZooKeeper from running
+# out of memory due to queued requests, ZooKeeper will throttle clients so that
+# there is no more than globalOutstandingLimit outstanding requests in the
+# system. The default limit is 1,000.ZooKeeper logs transactions to a
+# transaction log. After snapCount transactions are written to a log file a
+# snapshot is started and a new transaction log file is started. The default
+# snapCount is 10,000.
+{% if SNAP_COUNT is defined %}
+{% print 'snapCount=' + SNAP_COUNT %}
+{% endif %}
+
+
+#this part will be used for zookeeper with replication
+{% set HOSTLIST = groups['zookeeper'] | map('extract', hostvars, ['ansible_default_ipv4', 'address'])| list %}
+
+{% for host in HOSTLIST %}
+server.{{ HOSTLIST.index(host) }}={{ host }}:2188:3188
+{% endfor %}
+
+########### end of zookeeper with replication ####################
+

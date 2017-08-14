@@ -1,0 +1,51 @@
+---
+- name: setup the zookeeper data directory
+  file:
+    path: '{{ DATA_LOC }}'
+    owner: '{{ USER }}'
+    group: '{{ GROUP }}'
+    state: directory
+
+- name: setup the zookeeper log directory
+  file: 
+    path: '{{ DATA_LOG_LOC }}'
+    owner: '{{ USER }}'
+    group: '{{ GROUP }}' 
+    state: directory
+
+- name: creating the myid file 
+  template:
+    dest: '{{ DATA_LOC }}/myid'
+    src: myid.j2
+    owner: '{{ USER }}'
+    group: '{{ GROUP }}'
+
+- name: Setting up zoo.cfg
+  template: 
+    dest: '{{ BIN_LOC }}/conf/zoo.cfg'
+    src: zoo.cfg.j2
+    owner: '{{ USER }}'
+    group: '{{ GROUP }}'
+    
+- name: Setting up log4j.properties
+  template:
+    dest: '{{ BIN_LOC }}/conf/log4j.properties'
+    src: log4j.properties.j2
+    owner: '{{ USER }}'
+    group: '{{ GROUP }}'
+ 
+- name: Create zookeeper log directory
+  file:
+    path: '{{ ZOOKEEPER_LOG }}'
+    owner: '{{ USER }}'
+    group: '{{ GROUP }}'
+    state: directory
+
+- name: Copy the zookeeper service script
+  template:
+    dest: /etc/init.d/zookeeper
+    src: zookeeper-service.j2
+    mode: 0755
+
+- name: Enable the zookeeper service script
+  shell: "update-rc.d zookeeper defaults 0"

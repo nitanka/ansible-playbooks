@@ -1,7 +1,0 @@
----
-- name: test
-  hosts: localhost
-  vars:
-    ubuntu_ssh_port: 1100111
-  tasks: 
-    - include: file_edit.yml              # postfix.yml

@@ -1,0 +1,62 @@
+---
+RESTART_CLUSTER: true
+
+#User and group owning the spark process and installation directories
+SPARK_USER: spark 
+SPARK_GROUP: spark
+
+#Version of spark
+SPARK_VERSION: "2.1.0"
+
+#Version of hadoop the spark is compatible with
+HADOOP_VERSION: "2.7"
+
+#URL for downloading the spark 
+SPARK_URL: "http://d3kbcqa49mib13.cloudfront.net/spark-{{ SPARK_VERSION }}-bin-hadoop{{ HADOOP_VERSION }}.tgz"
+
+#Installation directory of spark 
+SPARK_HOME: /data/spark
+
+#Master WebUI port
+SPARK_MASTER_WEBUI_PORT: 8080
+
+#External IP of Master
+SPARK_MASTER_EXTERNAL_IP: "{{ groups['master'] | list | join(' ') }}"
+
+#To get the internal IP of master (used in AWS)
+SPARK_MASTER_HOST: "{{ hostvars[SPARK_MASTER_EXTERNAL_IP].ansible_default_ipv4['address'] }}" 
+
+# Temp file location for spark
+SPARK_LOCAL_DIRS: /data/spark/tmp
+
+#SPARK WORK CONNECTOR PORT. Workers will try connect to this port on master
+SPARK_MASTER_PORT: '7077'
+
+#Leave it blank if not needed, the samve value should be set in spark-env.sh
+SPARK_LOG_DIR: 
+ 
+#VARIABLES which will be set on spark-env.sh. Values will be replaced in spark-env.sh.j2 template
+# Leave them blank if you donot want to set them
+SPARK_VARIABLES:
+  SPARK_WORKER_CORES: 2
+  SPARK_WORKER_WEBUI_PORT: 8081
+  SPARK_WORKER_MEMORY: 500M
+  SPARK_WORKER_PORT: 
+  SPARK_WORKER_INSTANCES: 6
+  SPARK_WORKER_DIR:
+  SPARK_LOCAL_DIRS: '{{ SPARK_LOCAL_DIRS }}'
+  SPARK_MASTER_OPTS:
+  SPARK_WORKER_OPTS:       #to set config properties only for the worker (e.g. "-Dx=y")
+  SPARK_DAEMON_MEMORY:     # to allocate to the master, worker and history server themselves (default: 1g).
+  SPARK_HISTORY_OPTS:      # to set config properties only for the history server (e.g. "-Dx=y")
+  SPARK_SHUFFLE_OPTS:      # to set config properties only for the external shuffle service (e.g. "-Dx=y")
+  SPARK_PUBLIC_DNS: "{{ ansible_domain }}"
+
+
+#VARIABLES FOR ZOOKEEPER, by default, the zookeeper port is 2181, if we have different client port in zookeeper cluster, update the spark-env.sh
+# If using AWS, use internal IP of Zookeeper cluster 
+ZOOKEEPER:
+  - 10.0.1.4
+  - 10.0.1.147
+  - 10.0.1.117
+  

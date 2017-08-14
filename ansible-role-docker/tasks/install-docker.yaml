@@ -1,0 +1,43 @@
+--- 
+- name: create docker group
+  group:
+    name: docker
+    state: present
+
+- name: installing docker dependencies
+  apt:
+    name: "{{ item }}" 
+    state: present
+    update_cache: yes
+  with_items: "{{ DOCKER_DEPENDENCIES }}" #defined in vars/main.yaml
+
+- name: adding the docker key #add the gpg key for the docker keyserver
+  apt_key:
+    id: "{{ DOCKER_GPG_KEY }}" 
+    keyserver: "{{ DOCKER_KEYSERVER }}"
+
+- name: adding docker repository
+  apt_repository:
+    filename: "{{ DOCKER_SOURCELIST }}" 
+    repo: "{{ DOCKER_REPONAME }}"
+    state: present
+
+- name: installing docker
+  apt:
+    name: "{{ DOCKER_PACKAGE }}"
+    state: present
+    update_cache: true
+
+- name: checking if the user present
+  getent: 
+    key: "{{ DOCKER_USER }}" 
+    database: passwd
+    split: ':'
+    fail_key: false
+
+- name: add the user to the docker group
+  user: 
+     name: "{{ DOCKER_USER }}"
+     group: docker
+     append: yes
+  notify: restart docker 

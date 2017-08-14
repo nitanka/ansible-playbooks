@@ -1,0 +1,39 @@
+---
+VERSION: 3.3.6
+URL: http://www-us.apache.org/dist/zookeeper/zookeeper-{{ VERSION }}/zookeeper-{{ VERSION }}.tar.gz
+USER: zookeeper
+GROUP: zookeeper
+
+#Location of zookeeper binaries
+BIN_LOC: /opt/zookeeper
+DATA_LOC: /opt/zookeeper-data
+DATA_LOG_LOC: /opt/zookeeper-log
+
+#Location of zookeeper logs
+ZOOKEEPER_LOG: '{{ BIN_LOC }}/logs'
+
+####### log4j.properties ######
+
+#the log level of zookeeper log file
+# more information can be found https://stackoverflow.com/questions/26612908/why-does-zookeeper-not-use-my-log4j-properties-file-log-directory
+LOG_LEVEL: 'INFO, ROLLINGFILE'
+
+#Max size of each log file
+LOG_FILE_SIZE: '20MB'
+
+#Number of log files to keep
+LOG_FILE_NUMBER: 3
+
+##############################
+
+################ zoo.cfg ###################
+TICK_TIME: 2000
+INIT_LIMIT: 10
+SYNC_LIMIT: 5
+CLIENT_PORT: 2181
+SNAP_COUNT: '1000'
+
+###########################################
+
+#set this variable if you want to restart the Zookeeper cluster
+RESTART_CLUSTER: false

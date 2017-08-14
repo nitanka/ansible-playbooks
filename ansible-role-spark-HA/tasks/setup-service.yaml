@@ -1,0 +1,26 @@
+---
+- name: copy the master service script
+  template:
+    src: spark-master-service.j2
+    dest: /etc/init.d/spark-master
+    mode: 0755
+    owner: root
+    group: root
+  when: inventory_hostname in groups['master']
+
+- name: Enabling the service script
+  shell: update-rc.d spark-master defaults 0
+  when: inventory_hostname in groups['master']
+
+- name: copy the slave service script
+  template:
+    src: spark-worker-service.j2
+    dest: /etc/init.d/spark-slave
+    mode: 0755
+    owner: root
+    group: root
+  when: inventory_hostname in groups['slaves']
+
+- name: Enabling the service script
+  shell: update-rc.d spark-slave defaults 0
+  when: inventory_hostname in groups['slaves']

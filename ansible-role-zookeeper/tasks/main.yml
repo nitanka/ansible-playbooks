@@ -1,0 +1,14 @@
+---
+- name: Checking if the node is having zookeeper setup
+  stat:
+    path: /etc/init.d/zookeeper
+  register: zookeeper
+
+- include: download.yml
+  when: zookeeper.stat.exists == false
+
+- include: configure.yml
+  when: zookeeper.stat.exists == false
+
+- include: start-service.yml
+- include: clean-up.yml

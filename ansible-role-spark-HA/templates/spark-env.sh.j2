@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+#{{ ansible_managed }}
+
+{% for key,value in SPARK_VARIABLES.items() %}
+{% if value != None %}
+export {{ key }}={{ value }}
+{% endif %}
+{% endfor %}
+
+export SPARK_DAEMON_JAVA_OPTS="-Dspark.deploy.recoveryMode=ZOOKEEPER -Dspark.deploy.zookeeper.url={{ ZOOKEEPER | map('regex_replace','$', ':2181' )| list | join(',') }}"

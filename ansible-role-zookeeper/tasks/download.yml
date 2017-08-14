@@ -1,0 +1,35 @@
+---
+- name: Creating zookeeper group
+  group:
+    name: '{{ GROUP }}'
+    state: present
+
+- name: Creating the zookeeper user
+  user:
+    name: '{{ USER }}'
+    group: '{{ GROUP }}'
+    createhome: no
+    state: present
+    comment: 'zookeeper user'
+
+- name: Download the Zookeeper binaries
+  get_url:
+    url: '{{ URL }}'
+    dest: /tmp
+
+- name: Extracting the Zookeeper binaries
+  unarchive:
+    src: '/tmp/zookeeper-{{ VERSION }}.tar.gz'
+    dest: /tmp
+    owner: '{{ USER }}'
+    group: '{{ GROUP }}' 
+    remote_src: yes
+
+- name: Move the binary from /tmp to binary location
+  shell: 'mv /tmp/zookeeper-{{ VERSION }} {{ BIN_LOC }}'
+
+- name: Changing the ownership of the binary
+  file:
+    path: '{{ BIN_LOC }}'
+    owner: '{{ USER }}'
+    group: '{{ GROUP }}' 

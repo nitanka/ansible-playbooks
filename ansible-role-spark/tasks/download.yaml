@@ -1,0 +1,43 @@
+---
+- name: Download Spark
+  get_url: 
+    url: "{{ SPARK_URL }}"
+    dest: /tmp
+ 
+- name: Unarchiving spark 
+  unarchive: 
+    src: "/tmp/spark-{{ SPARK_VERSION }}-bin-hadoop{{ HADOOP_VERSION }}.tgz"
+    dest: /tmp
+    remote_src: true
+
+- name: Checking if spark home is present
+  stat:
+    path: "{{ SPARK_HOME | dirname }}"
+  register: spark_home_status
+
+- name: Create the spark home if not present
+  file:
+    path: '{{ SPARK_HOME | dirname }}'
+    state: directory
+    recurse: yes
+  when: spark_home_status.stat.exists == false
+
+- name: Moving the contents of spark to installation location
+  command: "mv /tmp/spark-{{ SPARK_VERSION }}-bin-hadoop{{ HADOOP_VERSION }} {{ SPARK_HOME }}"
+
+- name: Changing the owner of to spark
+  file:
+    path: "{{ SPARK_LOCAL_DIRS }}"
+    state: directory
+    owner: "{{ SPARK_USER }}"
+    group: "{{ SPARK_GROUP }}"
+    recurse: yes
+
+- name: Changing the owner to spark
+  file:
+    path: "{{ SPARK_HOME }}"
+    state: directory
+    owner: "{{ SPARK_USER }}"
+    group: "{{ SPARK_GROUP }}"
+    recurse: yes
+
